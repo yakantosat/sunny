@@ -1,0 +1,225 @@
+<!-- BEGIN PAGE HEADER-->
+<div class="row">
+   <div class="col-md-12">
+      <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+      <h3 class="page-title">
+          系数计算模板
+      </h3>
+      <ul class="page-breadcrumb breadcrumb">
+         <li>
+            <i class="icon-home"></i>
+            <a>工资计算</a>
+            <i class="icon-angle-right"></i>
+         </li>
+         <li>
+            <a>系数计算模板</a>
+         </li>
+      </ul>
+      <!-- END PAGE TITLE & BREADCRUMB-->
+   </div>
+</div>
+<!-- END PAGE HEADER-->
+
+<div id="kpidata" style="display: none;"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="portlet box blue">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="icon-edit"></i>
+                    创建模板
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"></a>
+                    <a href="#portlet-config" data-toggle="modal" class="config"></a>
+                    <a href="javascript:;" class="reload"></a>
+                    <a href="javascript:;" class="remove"></a>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <form action="#" class="form-horizontal">
+                    <div class="form-body">
+		                <div class="table-toolbar">
+		                    <div class="btn-group">
+		                        <button id="add_record" class="btn green" onclick="add_kpi()">
+		                            Add New
+		                            <i class="icon-plus"></i>
+		                        </button>
+		                    </div>
+		                    <div class="btn-group pull-right">
+		                        <button class="btn dropdown-toggle" data-toggle="dropdown">
+		                            Tools
+		                            <i class="icon-angle-down"></i>
+		                        </button>
+		                        <ul class="dropdown-menu pull-right">
+		                            <li><a href="#">1</a></li>
+		                            <li><a href="#">2</a></li>
+		                        </ul>
+		                    </div>
+		                </div>
+		                <div class="dataTables_wrapper form-inline" role="grid" id="sunny_wrapper">
+		                    <div class="row">
+		                        <div class="col-md-3">
+		                            <div class="dataTables_length" id="sunny_length">
+		                                <select class="form-control input-small" id="rule">
+		                                    <option value="score">按分数</option>
+		                                    <option value="rank">按排名</option>
+		                                </select>
+		                            </div>
+		                        </div>
+		                        <div class="col-md-3">
+		                            <input type="text" class="form-control" id="kpi_template_name">
+		                        </div>
+		                    </div>
+		                    <div class="table-scrollable">
+		                        <table class="table table-striped table-hover table-bordered dataTable" id="kpi_template">
+		                            <thead>
+		                                <tr>
+		                                    <th>档位</th>
+		                                    <th>kpi系数</th>
+		                                    <th>Edit</th>
+		                                    <th>Delete</th>
+		                                </tr>
+		                            </thead>
+		                            <tbody></tbody>
+		                        </table>
+		                    </div>
+		                </div>
+	                </div>
+	                <div class="form-actions fluid">
+	                    <div class="col-md-offset-3 col-md-9">
+	                        <button type="button" class="btn blue" onclick="submit_template()">Submit</button>
+	                        <button type="button" class="btn default">Cancel</button>
+	                    </div>
+	                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="portlet box green">
+        </div>
+    </div>
+</div>
+
+<script>
+function load_table() {
+	var htmls = '';
+	$('#kpi_template > tbody').empty();
+	var records = $('#kpidata').data('kpi_records');
+
+	for (var i = 0; i < records.length; i++) {
+		htmls += '<tr>' +
+	         '<td>' + records[i]['stall'] + '</td>' +
+	         '<td>' + records[i]['coeff'] + '</td>' +
+	         '<td><a href="#" onclick="edit_one(' + i + ')">Edit</a></td>' +
+	         '<td><a href="#" onclick="delete_one(' + i + ')">Delete</a></td>' +
+	         '</tr>';
+    }
+	$('#kpi_template > tbody').append(htmls);
+}
+
+function delete_one(index) {
+	var records = $('#kpidata').data('kpi_records');
+	records.splice(index, 1);
+	$('#kpidata').data('kpi_records', records);
+	
+	load_table();
+}
+
+function edit_one(index) {
+	var records = $('#kpidata').data('kpi_records');
+	$('#kpi_template > tbody').children('tr').eq(index).empty();
+	
+	var htmls = '<td><input class="form-control" id="edit_kpi_stall" value="' + records[index]['stall'] + '"></td>' +
+	            '<td><input class="form-control" id="edit_kpi_coeff" value="' + records[index]['coeff'] + '"></td>' +
+	            '<td><a href="#" onclick="save_edit('+ index +')">Save</a></td>' +
+                '<td><a href="#" onclick="cancel()">Cancel</a></td>';
+                
+    $('#kpi_template > tbody').children('tr').eq(index).html(htmls);
+}
+
+function save_edit(index) {
+	var records = $('#kpidata').data('kpi_records');
+	var stall = $.trim($('#edit_kpi_stall').val());
+	var coeff = $.trim($('#edit_kpi_coeff').val());
+	
+	records[index]['stall'] = stall;
+	records[index]['coeff'] = coeff;
+	
+	$('#kpidata').data('kpi_records', records);
+	load_table();
+}
+
+function add_kpi() {
+	var htmls = '';
+	var new_kpi = '<tr>' +
+    '<td><input class="form-control input-large" id="new_kpi_stall"></td>' +
+    '<td><input class="form-control" id="new_kpi_coeff"></td>' +
+    '<td><a href="#" onclick="save()">Save</a></td>' +
+    '<td><a href="#" onclick="cancel()">Cancel</a></td>' +
+    '</tr>';
+    
+	$('#kpi_template > tbody').empty();
+	var kpi_records = $('#kpidata').data('kpi_records');
+	if (kpi_records.length > 0) {
+	    for (var i = 0; i < kpi_records.length; i++) {
+		    htmls += '<tr>' +
+		         '<td>' + kpi_records[i]['stall'] + '</td>' +
+		         '<td>' + kpi_records[i]['coeff'] + '</td>' +
+		         '<td><a href="#" onclick="edit(' + i + ')">Edit</a></td>' +
+		         '<td><a href="#" onclick="delete(' + i + ')">Delete</a></td>' +
+		         '</tr>';
+	    }
+	    $('#kpi_template > tbody').append(htmls);
+	    $('#kpi_template > tbody  tr').last().after(new_kpi);
+    } else {
+    	$('#kpi_template > tbody').append(new_kpi);
+    }
+}
+
+function save() {
+	var records = $('#kpidata').data('kpi_records');
+	var tmp = {};
+	tmp['stall'] = $.trim($('#new_kpi_stall').val());
+	tmp['coeff'] = $.trim($('#new_kpi_coeff').val());
+	records.push(tmp);
+	
+	$('#kpidata').data('kpi_records', records);
+
+	load_table();
+}
+
+function cancel() {
+	load_table();
+}
+
+function submit_template() {
+	var templates = $('#kpidata').data('kpi_records');
+	var name = $.trim($('#kpi_template_name').val());
+	var rule = $('#rule').find('option:selected').val();
+	
+	$.ajax({
+		type: 'POST',
+		async: true,
+		data: JSON.stringify({'records': templates, 'name': name, 'rule': rule}),
+		url: 'sunny/kpi/submit_template/',
+		success: function (data) {
+			console.log(data.status);
+		},
+		contentType: 'application/json; charset=utf8',
+		processData: false
+	});
+}
+</script>
+
+<script>
+jQuery(document).ready(function () {
+	var init_list = [];
+	$('#kpidata').data('kpi_records', init_list);
+});
+</script>
