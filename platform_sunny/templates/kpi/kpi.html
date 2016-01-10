@@ -42,7 +42,7 @@
                     <div class="form-body">
 		                <div class="table-toolbar">
 		                    <div class="btn-group">
-		                        <button id="add_record" class="btn green" onclick="add_kpi()">
+		                        <button type="button" id="add_record" class="btn green" onclick="add_kpi()">
 		                            Add New
 		                            <i class="icon-plus"></i>
 		                        </button>
@@ -68,8 +68,15 @@
 		                                </select>
 		                            </div>
 		                        </div>
-		                        <div class="col-md-3">
-		                            <input type="text" class="form-control" id="kpi_template_name">
+		                        <div class="row">
+		                            <div class="col-md-6">
+		                                <div class="col-md-3">
+		                                    <label class="control-label">模版名</label>
+		                                </div>
+		                                <div class="col-md-3">
+		                                    <input type="text" class="form-control input-large" id="kpi_template_name">
+		                                </div>
+		                            </div>
 		                        </div>
 		                    </div>
 		                    <div class="table-scrollable">
@@ -90,7 +97,7 @@
 	                <div class="form-actions fluid">
 	                    <div class="col-md-offset-3 col-md-9">
 	                        <button type="button" class="btn blue" onclick="submit_template()">Submit</button>
-	                        <button type="button" class="btn default">Cancel</button>
+	                        <button type="button" class="btn default" onclick="cancel_template()">Cancel</button>
 	                    </div>
 	                </div>
                 </form>
@@ -102,9 +109,86 @@
 <div class="row">
     <div class="col-md-12">
         <div class="portlet box green">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="icon-cogs"></i>
+                    已建立的模板
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"></a>
+                    <a href="#portlet-config" data-toggle="modal" class="config"></a>
+                    <a href="javascript:;" class="reload"></a>
+                    <a href="javascript:;" class="remove"></a>
+                </div>
+            </div>
+            <div class="portlet-body flip-scroll">
+                <table class="table table-bordered table-striped table-condensed flip-content" id="kpi_table">
+                    <thead class="flip-content">
+                        <tr>
+                            <th>模板名称</th>
+                            <th>模板规则</th>
+                            <th>创建时间</th>
+                            <th>修改</th>
+                            <th>删除</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- 修改模板弹出层 -->
+<div class="modal-scrollable" id="modal_modify_template" style="z-index: 10051; display: none;">
+        <div class="modal container fade in" tabindex="-1" aria-hidden="false" style="display: block; margin-top: -138.5px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="close_modify()"></button>
+                <h4 class="modal-title" id="modify_title"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="portlet box blue">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="icon-edit"></i>
+                                    模板修改
+                                </div>
+                                <div class="tools">
+                                    <a href="javascript:;" class="collapse"></a>
+                                    <a href="#portlet-config" data-toggle="modal" class="config"></a>
+                                    <a href="javascript:;" class="reload"></a>
+                                    <a href="javascript:;" class="remove"></a>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-toolbar">
+                                    <a href="#" class="btn green" onclick="add_modify_record()">Add New&nbsp;<i class="icon-plus"></i></a>
+                                </div>
+                                <div class="table-scrollable">
+                                    <table class="table table-striped table-hover table-bordered dataTable" id="modify_table">
+                                        <thead>
+                                            <tr>
+		                                        <th>档位</th>
+		                                        <th>kpi系数</th>
+		                                        <th>Edit</th>
+		                                        <th>Delete</th>
+		                                    </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+<!-- 背景 -->
+<div class="modal-backdrop fade in" id="sunny_backdrop" style="z-index: 10050; display: none;"></div>
 
 <script>
 function load_table() {
@@ -158,8 +242,18 @@ function save_edit(index) {
 function add_kpi() {
 	var htmls = '';
 	var new_kpi = '<tr>' +
-    '<td><input class="form-control input-large" id="new_kpi_stall"></td>' +
-    '<td><input class="form-control" id="new_kpi_coeff"></td>' +
+    '<td><input class="form-control input-small" id="left_value">&nbsp;' +
+         '<select class="form-control input-small" id="left_sign">' +
+             '<option value="le">&lt;=</option>' +
+             '<option value="lt">&lt;</option>' +
+             '<option value="eq">=</option></select>' +
+         '&nbsp;X&nbsp;' +
+         '<select class="form-control input-small" id="right_sign">' +
+             '<option value="ge">&gt;=</option>' +
+             '<option value="gt">&gt;</option>' +
+             '<option value="eq">=</option></select>&nbsp;' +
+         '<input class="form-control input-small" id="right_value"></td>' +
+    '<td><input class="form-control input-large" id="new_kpi_coeff"></td>' +
     '<td><a href="#" onclick="save()">Save</a></td>' +
     '<td><a href="#" onclick="cancel()">Cancel</a></td>' +
     '</tr>';
@@ -182,20 +276,100 @@ function add_kpi() {
     }
 }
 
+function add_modify_record() {
+	var new_kpi = '<tr>' +
+	                  '<td><input class="form-control input-small" id="modify_left_value">&nbsp;' +
+	                      '<select class="form-control input-small" id="modify_left_sign">' +
+	                          '<option value="le">&lt;=</option>' +
+	                          '<option value="lt">&lt;</option>' +
+	                          '<option value="eq">=</option></select>' +
+	                      '&nbsp;X&nbsp;' +
+	                      '<select class="form-control input-small" id="modify_right_sign">' +
+	                          '<option value="ge">&gt;=</option>' +
+	                          '<option value="gt">&gt;</option>' +
+	                          '<option value="eq">=</option></select>&nbsp;' +
+	                      '<input class="form-control input-small" id="modify_right_value"></td>' +
+	                  '<td><input class="form-control" id="modify_new_kpi_coeff"></td>' +
+	                  '<td><a href="#" class="btn btn-sm blue" onclick="save_modify_new()"><i class="icon-save"></i></a></td>' +
+	                  '<td><a href="#" class="btn btn-sm default" onclick="cancel_modify_new()"><i class="icon-remove"></i></a></td>' +
+	              '</tr>';
+	              
+	$('#modify_table > tbody').children('tr').eq(0).before(new_kpi);
+}
+
+//TODO: save_modify_new() cancel_modify_new()
+function save_modify_new() {
+	var tid = $('#kpidata').data('curr_tid');
+	var left_value = parseFloat($.trim($('#modify_left_value').val()));
+	var right_value = parseFloat($.trim($('#modify_right_value').val()));
+	var left_sign = $('#modify_left_sign').find('option:selected').val();
+	var right_sign = $('#modify_right_sign').find('option:selected').val();
+	
+	var stall = [left_sign, left_value, right_sign, right_value].join();
+	var coeff = parseFloat($.trim($('#modify_new_kpi_coeff').val()));
+	
+	if (__check_form(stall, coeff)) {
+		$.ajax({
+			type: 'POST',
+			async: true,
+			data: {'tid': tid, 'stall': stall, 'coeff': coeff},
+			url: 'sunny/kpi/save_modify_new/',
+			success: function (data) {
+				load_modify(tid);
+			},
+			contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+			processData: true
+		});
+	} else {
+		__gritter_add('数据错误', '档位或系数有误!');
+	}
+}
+
+function cancel_modify_new() {
+	var tid = $('#kpidata').data('curr_tid');
+	load_modify(tid);
+}
+
+function __check_form(stall, coeff) {
+	if (typeof(stall) === 'string' && typeof(coeff) === 'number') {
+		return true;
+	}
+	return false;
+}
+
 function save() {
 	var records = $('#kpidata').data('kpi_records');
 	var tmp = {};
-	tmp['stall'] = $.trim($('#new_kpi_stall').val());
-	tmp['coeff'] = $.trim($('#new_kpi_coeff').val());
-	records.push(tmp);
+	var left_value = parseFloat($.trim($('#left_value').val()));
+	var right_value = parseFloat($.trim($('#right_value').val()));
+	var left_sign = $('#left_sign').find('option:selected').val();
+	var right_sign = $('#right_sign').find('option:selected').val();
 	
-	$('#kpidata').data('kpi_records', records);
+	var stall = [left_sign, left_value, right_sign, right_value].join();
+	var coeff = parseFloat($.trim($('#new_kpi_coeff').val()));
+	
+	if (__check_form(stall, coeff)) {
+		tmp['stall'] = stall;
+		tmp['coeff'] = coeff;
+		
+		records.push(tmp);
+		$('#kpidata').data('kpi_records', records);
+	} else {
+		__gritter_add('数据输入错误', '档位或系数有误!');
+	}
 
 	load_table();
 }
 
 function cancel() {
 	load_table();
+}
+
+function __clear_form() {
+	$('#kpi_template_name').val('');
+	$('#kpi_template > tbody').empty();
+	$('#kpidata').removeData('kpi_records');
+	$('#kpidata').data('kpi_records', []);
 }
 
 function submit_template() {
@@ -209,17 +383,204 @@ function submit_template() {
 		data: JSON.stringify({'records': templates, 'name': name, 'rule': rule}),
 		url: 'sunny/kpi/submit_template/',
 		success: function (data) {
-			console.log(data.status);
+			$('#kpidata').removeData('kpi_records');
+			$('#kpidata').data('kpi_records', []);
+			load_templates();
+			__clear_form();
 		},
-		contentType: 'application/json; charset=utf8',
+		contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+		processData: true
+	});
+}
+
+function cancel_template() {
+	__clear_form();
+}
+
+function load_templates() {
+	var htmls = '';
+	$('#kpi_table > tbody').empty();
+	
+	$.ajax({
+		type: 'GET',
+		async: true,
+		url: 'api/v0.1a/templates/',
+		success: function (data) {
+			//var templates = [];
+			var objs = data.objects;
+			for (var i = 0; i < objs.length; i++) {
+				var record = {};
+				htmls += '<tr>' +
+				             '<td>' + objs[i]['name'] + '</td>' +
+				             '<td>' + objs[i]['rule'] + '</td>' +
+				             '<td>' + objs[i]['create_date'] + '</td>' +
+				             '<td><a href="#'+ objs[i]['name'] +'" class="btn btn-sm green" onclick="modify_template('+ objs[i]['id'] +', this)"><i class="icon-pencil"></i></a></td>' +
+				             '<td><a href="#" class="btn btn-sm red" onclick="delete_template('+objs[i]['id']+')"><i class="icon-trash"></i></a></td>' +
+				         '</tr>';
+				//record['id'] = objs[i]['id'];
+				//record['name'] = objs[i]['name'];
+				//record['rule'] = objs[i]['rule'];
+				//record['create_date'] = objs[i]['create_date'];
+				
+				//templates.push(record);
+			}
+			$('#kpi_table > tbody').append(htmls);
+			
+			//$('#kpidata').data('kpi_templates', templates);
+		},
+		contentType: 'application/json',
 		processData: false
 	});
+}
+
+function close_modify() {
+	$('#modal_modify_template').hide();
+	$('#sunny_backdrop').hide();
+	$('#kpidata').removeData('kpi_records');
+	$('#kpidata').data('kpi_records', []);
+}
+
+function load_modify(tid) {
+	$('#modify_table > tbody').empty();
+	var htmls = "";
+	
+	$.ajax({
+		type: 'GET',
+		async: true,
+		url: 'api/v0.1a/template_records/?tid=' + tid,
+		success: function (data) {
+			var curr_template = [];
+			var objs = data.objects;
+			for (var i = 0; i < objs.length; i++) {
+				var record = {};
+				htmls += '<tr>' +
+				             '<td>' + objs[i]['stall'] + '</td>' +
+				             '<td>' + objs[i]['coeff'] + '</td>' +
+				             '<td><a href="#" class="btn btn-sm green" onclick="edit_modify('+ i + ',' + tid +')"><i class="icon-pencil"></i></a></td>' +
+				             '<td><a href="#" class="btn btn-sm red" onclick="delete_modify('+ objs[i]['id'] +','+ tid +')"><i class="icon-remove"></i></a></td>' +
+				         '</tr>';
+				         
+			    record['stall'] = objs[i]['stall'];
+			    record['coeff'] = objs[i]['coeff'];
+			    record['id'] = objs[i]['id'];
+			    
+			    curr_template.push(record);
+			}
+			$('#modify_table > tbody').append(htmls);
+			
+			$('#kpidata').data('kpi_records', curr_template);
+		},
+		contentType: 'application/json',
+		processData: false
+	});
+}
+
+function modify_template(tid, self) {
+	$('#modal_modify_template').show();
+	$('#sunny_backdrop').show();
+	
+	$('#modify_title').text(self.href.split('#')[1]);
+	$('#kpidata').data('curr_tid', tid);
+	
+	load_modify(tid);
+}
+
+function edit_modify(index, tid) {
+	var htmls = '';
+    var records = $('#kpidata').data('kpi_records');
+	$('#modify_table > tbody').children('tr').eq(index).empty();
+	
+	htmls = '<td><input class="form-control" id="modify_temp_stall" value="' + records[index]['stall'] + '"></td>' +
+	        '<td><input class="form-control" id="modify_temp_coeff" value="' + records[index]['coeff'] + '"></td>' +
+	        '<td><a href="#" class="btn btn-sm blue" onclick="update_template('+ records[index]['id'] +',' + tid +')"><i class="icon-ok"></i></a></td>' +
+	        '<td><a href="#" class="btn btn-sm default" onclick="cancel_template1('+ tid +')"><i class="icon-remove"></i></a></td>';
+	        
+	$('#modify_table > tbody').children('tr').eq(index).html(htmls);
+	$('#kpidata').removeData('kpi_records');
+	$('#kpidata').data('kpi_records', []);
+}
+
+function update_template(rid, tid) {
+	var stall = $.trim($('#modify_temp_stall').val());
+	var coeff = parseFloat($.trim($('#modify_temp_coeff').val()));
+	
+	if (__check_form(stall, coeff)) {
+		$.ajax({
+			type: 'POST',
+			async: true,
+			data: {'rid': rid, 'stall': stall, 'coeff': coeff},
+			url: 'sunny/kpi/update_template/',
+			success: function (data) {
+				load_modify(tid);
+			},
+			contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+			processData: true
+		});
+	}
+}
+
+function cancel_template1(tid) {
+	var tid = $('#kpidata').data('curr_tid');
+	load_modify(tid);
+}
+
+function delete_modify(rid, tid) {
+	var r = confirm('是否删除该记录?');
+	if (r == true) {
+		$.ajax({
+			type: 'POST',
+			async: true,
+			data: {'rid': rid},
+			url: 'sunny/kpi/delete_record/',
+			success: function (data) {
+				load_modify(tid);
+			},
+			contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+			processData: true
+		});
+	}
+}
+
+// delete template
+function delete_template(tid) {
+	var r = confirm('是否删除该模板?');
+	if (r === true) {
+		$.ajax({
+			type: 'POST',
+			async: true,
+			data: {'tid': tid},
+			url: 'sunny/kpi/delete_template/',
+			success: function (data) {
+				load_templates();
+			},
+			contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+			processData: true
+		});
+	}
+}
+
+function __gritter_add(title, text) {
+    var gid = $.gritter.add({
+        title: title,
+        text: text,
+        image: 'assets/img/avatar2.jpg',
+        sticky: true,
+        time: '',
+        fade_out_speed: 100
+    });
+
+    setTimeout(function() {
+        $.gritter.remove(gid, {
+            fade: true,
+            speed: 'slow'
+        });
+    }, 3000);
 }
 </script>
 
 <script>
 jQuery(document).ready(function () {
-	var init_list = [];
-	$('#kpidata').data('kpi_records', init_list);
+	load_templates();
+	$('#kpidata').data('kpi_records', []);
 });
 </script>

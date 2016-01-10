@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+encoding//platform_sunny/calc.py=utf8
 encoding//platform_sunny/models.py=utf-8
 encoding//platform_sunny/serializers.py=utf-8
+encoding//platform_sunny/views/kpi/calc_template.py=utf-8
 encoding//platform_sunny/views/kpi/kpi_template.py=utf-8

@@ -40,3 +40,50 @@ def submit_template(request):
         t_kpi_records.objects.bulk_create(kpi_record_l)
         
         return JsonResponse({'status': 'submit_kpi_template_ok'})
+    
+def delete_template(request):
+    """
+    tid is the id of template which will be deleted.
+    """
+    if request.method == 'POST':
+        tid = int(request.POST.get('tid'))
+        t_kpi.objects.filter(id=tid).delete()
+        
+        return JsonResponse({'status': 'delete_kpi_template_ok'})
+    
+def update_template(request):
+    """
+    rid is the id of t_kpi_records
+    stall
+    coeff
+    """
+    if request.method == 'POST':
+        rid = int(request.POST.get('rid'))
+        stall = request.POST.get('stall')
+        coeff = request.POST.get('coeff')
+        
+        t_kpi_records.objects.filter(id=rid).update(stall=stall, coeff=coeff)
+        return JsonResponse({'status': 'confirm_kpi_record_ok'})
+    
+def delete_record(request):
+    """
+    rid is the id of t_kpi_records
+    """
+    if request.method == 'POST':
+        rid = int(request.POST.get('rid'))
+        
+        t_kpi_records.objects.filter(id=rid).delete()
+        return JsonResponse({'status': 'delete_kpi_record_ok'})
+    
+def save_modify_new(request):
+    """
+    To save the new t_kpi_records in modify.
+    """
+    if request.method == 'POST':
+        tid = int(request.POST.get('tid'))
+        stall = request.POST.get('stall')
+        coeff = request.POST.get('coeff')
+        
+        t = t_kpi_records.objects.create(tid = tid, stall = stall, coeff = coeff)
+        
+        return JsonResponse({'status': 'save_modify_new_ok', 'new_id': t.id})

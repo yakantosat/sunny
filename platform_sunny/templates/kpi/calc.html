@@ -1,0 +1,53 @@
+<!-- BEGIN PAGE HEADER-->
+<div class="row">
+   <div class="col-md-12">
+      <!-- BEGIN PAGE TITLE & BREADCRUMB-->
+      <h3 class="page-title">
+          系数计算模板
+      </h3>
+      <ul class="page-breadcrumb breadcrumb">
+         <li>
+            <i class="icon-home"></i>
+            <a>工资计算</a>
+            <i class="icon-angle-right"></i>
+         </li>
+         <li>
+            <a>工资计算</a>
+         </li>
+      </ul>
+      <!-- END PAGE TITLE & BREADCRUMB-->
+   </div>
+</div>
+<!-- END PAGE HEADER-->
+
+<div id="calcData" style="display: none;"></div>
+<link href="assets/plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" type="text/css" />
+
+<div class="row">
+    <div class="col-md-12">
+        <blockquote>
+            <p style="font-size: 16px">
+            一些说明事项
+            </p>
+        </blockquote>
+        <br>
+        <form id="fileupload" action="#" class enctype="multipart/form-data">
+            <div class="row fileupload-buttonbar">
+                <div class="col-lg-7">
+                    <span class="btn green fileinput-button">
+                        <i class="icon-plus"></i>
+                        <span>Add Files...</span>
+                        <input type="file" name="files[]" multiple>
+                    </span>
+                    <button type="button" class="btn blue start">
+                        <i class="icon-play-circle"></i>
+                        <span>Start Calc</span>
+                    </button>
+                </div>
+            </div>
+            <table role="presentation" class="table table-striped clearfix">
+                <tbody class="files"></tbody>
+            </table>
+        </form>
+    </div>
+</div>
