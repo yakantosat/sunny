@@ -141,7 +141,7 @@
 
 <!-- 修改模板弹出层 -->
 <div class="modal-scrollable" id="modal_modify_template" style="z-index: 10051; display: none;">
-        <div class="modal container fade in" tabindex="-1" aria-hidden="false" style="display: block; margin-top: -138.5px;">
+        <div class="modal container fade in" tabindex="-1" aria-hidden="false" style="display: block; margin-top: -300.5px;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="close_modify()"></button>
                 <h4 class="modal-title" id="modify_title"></h4>
@@ -242,17 +242,17 @@ function save_edit(index) {
 function add_kpi() {
 	var htmls = '';
 	var new_kpi = '<tr>' +
-    '<td><input class="form-control input-small" id="left_value">&nbsp;' +
-         '<select class="form-control input-small" id="left_sign">' +
+    '<td><input class="form-control input-xsmall" id="left_value">&nbsp;' +
+         '<select class="form-control input-mxsmall" id="left_sign">' +
              '<option value="le">&lt;=</option>' +
              '<option value="lt">&lt;</option>' +
              '<option value="eq">=</option></select>' +
          '&nbsp;X&nbsp;' +
-         '<select class="form-control input-small" id="right_sign">' +
+         '<select class="form-control input-mxsmall" id="right_sign">' +
              '<option value="ge">&gt;=</option>' +
              '<option value="gt">&gt;</option>' +
              '<option value="eq">=</option></select>&nbsp;' +
-         '<input class="form-control input-small" id="right_value"></td>' +
+         '<input class="form-control input-xsmall" id="right_value"></td>' +
     '<td><input class="form-control input-large" id="new_kpi_coeff"></td>' +
     '<td><a href="#" onclick="save()">Save</a></td>' +
     '<td><a href="#" onclick="cancel()">Cancel</a></td>' +
@@ -278,17 +278,17 @@ function add_kpi() {
 
 function add_modify_record() {
 	var new_kpi = '<tr>' +
-	                  '<td><input class="form-control input-small" id="modify_left_value">&nbsp;' +
-	                      '<select class="form-control input-small" id="modify_left_sign">' +
+	                  '<td><input class="form-control input-xsmall" id="modify_left_value">&nbsp;' +
+	                      '<select class="form-control input-mxsmall" id="modify_left_sign">' +
 	                          '<option value="le">&lt;=</option>' +
 	                          '<option value="lt">&lt;</option>' +
 	                          '<option value="eq">=</option></select>' +
 	                      '&nbsp;X&nbsp;' +
-	                      '<select class="form-control input-small" id="modify_right_sign">' +
+	                      '<select class="form-control input-mxsmall" id="modify_right_sign">' +
 	                          '<option value="ge">&gt;=</option>' +
 	                          '<option value="gt">&gt;</option>' +
 	                          '<option value="eq">=</option></select>&nbsp;' +
-	                      '<input class="form-control input-small" id="modify_right_value"></td>' +
+	                      '<input class="form-control input-xsmall" id="modify_right_value"></td>' +
 	                  '<td><input class="form-control" id="modify_new_kpi_coeff"></td>' +
 	                  '<td><a href="#" class="btn btn-sm blue" onclick="save_modify_new()"><i class="icon-save"></i></a></td>' +
 	                  '<td><a href="#" class="btn btn-sm default" onclick="cancel_modify_new()"><i class="icon-remove"></i></a></td>' +

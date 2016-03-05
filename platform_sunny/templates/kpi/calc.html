@@ -21,7 +21,6 @@
 <!-- END PAGE HEADER-->
 
 <div id="calcData" style="display: none;"></div>
-<link href="assets/plugins/jquery-file-upload/css/jquery.fileupload-ui.css" rel="stylesheet" type="text/css" />
 
 <div class="row">
     <div class="col-md-12">
@@ -31,13 +30,13 @@
             </p>
         </blockquote>
         <br>
-        <form id="fileupload" action="#" class enctype="multipart/form-data">
+        <form id="fileupload_form" action="#" enctype="multipart/form-data" method="post">
             <div class="row fileupload-buttonbar">
                 <div class="col-lg-7">
                     <span class="btn green fileinput-button">
                         <i class="icon-plus"></i>
                         <span>Add Files...</span>
-                        <input type="file" name="files[]" multiple>
+                        <input id="fileupload" type="file" name="files[]" multiple onchange="handler()">
                     </span>
                     <button type="button" class="btn blue start">
                         <i class="icon-play-circle"></i>
@@ -45,9 +44,109 @@
                     </button>
                 </div>
             </div>
-            <table role="presentation" class="table table-striped clearfix">
+            <br>
+            <table role="presentation" class="table table-striped clearfix" id="fileupload_records">
                 <tbody class="files"></tbody>
             </table>
         </form>
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">注意事项</h3>
+            </div>
+            <div class="panel-body">
+                <ul>
+                    <li>可以同时上传多个文件，点击 start 后开始上传</li>
+                    <li>等到所有文件上传完成后，点击 start calc 即开始计算</li>
+                    <li>最终能够得到处理完成文件的预览，以及下载链接</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function addTable(index, filename, filesize) {
+	var tag = filename.split('.')[0];
+	var option = $('#calcData').data('upload_option_html');
+	var record = '<tr>' +
+	                 '<td><img src="assets/img/excel.jpeg"></img></td>' +
+	                 '<td><p class="name">' + filename + '</p></td>' +
+	                 '<td><p class="size">' + filesize/1000 + 'KB</p>' +
+	                     '<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">' +
+	                         '<div id="process_'+ tag +'" class="progress-bar progress-bar-success" style="width:0%;"></div>' +
+	                     '</div></td>' +
+	                 '<td><select class="form-control input-small" id="select_'+ tag +'">' +
+	                     option +'</select></td>' +
+	             '</tr>';
+	
+    $('#fileupload_records > tbody').append(record);
+}
+
+function cancel_upload(self) {
+	console.log($(self).parents('tr'));
+	$(self).parents('tr').remove();
+}
+
+function handler() {
+	
+	$('#fileupload').fileupload({
+		add: function (e, data) {
+			$.each(data.files, function (index, file) {
+				addTable(index, file.name, file.size);
+				$('<td>').appendTo($('#fileupload_records > tbody tr:last'));
+				
+				var start = '<button class="btn blue start" type="button">' +
+				                '<i class="icon-upload"></i>' +
+				                '<span>Start</span>' +
+				            '</button>';
+				            
+				$(start).appendTo($('#fileupload_records > tbody tr:last').children('td').eq(4))
+						.click(function () {
+							console.log(file.name, file.size);
+							var calcClass = $(this).parents('tr').children('td').eq(3).children('select').find('option:selected').val();
+							data.formData = {cc: calcClass};
+							data.submit();
+						});
+				
+				var cancelUpload = '<button class="btn red cancel" type="button" onclick="cancel_upload(this)">' +
+				                       '<i class="icon-ban-circle"></i>' +
+				                       '<span>Cancel</span>' +
+				                   '</button>';
+				$(cancelUpload).appendTo($('#fileupload_records > tbody tr:last').children('td').eq(4));
+			});
+		},
+		done: function (e, data) {
+			var process = parseInt(data.loaded / data.total * 100, 10);
+			$('#' + data.files[0].name).css('width', process + '%');
+			console.log('upload finished!');
+		}
+	});	
+}
+</script>
+
+<script>
+jQuery(document).ready(function () {
+	$('#fileupload').fileupload({
+		// 上传文件初始化
+		url: 'sunny/kpi/file_upload/'
+	});
+	
+	$.ajax({
+		type: 'GET',
+		async: true,
+		url: 'api/v0.1a/templates/',
+		success: function (data) {
+			var html = '';
+			var obj_list = data.objects;
+			for (var i = 0; i < obj_list.length; i++) {
+				html += '<option value="'+ obj_list[i]['id'] +'">' + obj_list[i]['name'] + '</option>';
+			}
+			$('#calcData').data('upload_option_html', html);
+		},
+		contentType: 'application/json',
+		processData: false
+	});
+	
+	$('#calcData').data('upload_jobs', []);
+});
+</script>
