@@ -17975,6 +17975,10 @@ Forms
   width: 80px !important;
 }
 
+.input-mxsmall {
+  width: 90px !important;
+}
+
 .input-small {
   width: 145px !important;
 }

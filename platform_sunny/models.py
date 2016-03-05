@@ -21,3 +21,12 @@ class t_kpi_records(models.Model):
     
     class Meta:
         db_table = "t_kpi_records"
+        
+# t_kpi_jobs 任务表
+class t_kpi_jobs(models.Model):
+    name = models.CharField(verbose_name="计算类名", max_length=100)
+    create_date = models.DateTimeField(verbose_name="创建时间")
+    end_date = models.DateTimeField(verbose_name="结束时间")
+    
+    class Meta:
+        db_table = 't_kpi_jobs'

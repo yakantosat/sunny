@@ -24,4 +24,5 @@ urlpatterns = patterns('',
     url(r'^sunny/kpi/save_modify_new/', 'platform_sunny.views.kpi.kpi_template.save_modify_new'),
     
     url(r'^sunny/kpi/calc.html', 'platform_sunny.views.kpi.calc_template.calc_template'),
+    url(r'^sunny/kpi/file_upload/', 'platform_sunny.views.kpi.calc_template.fileupload'),
 )
